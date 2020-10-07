@@ -1,6 +1,8 @@
 import React from 'react';
 import cn from 'classnames';
 
+import { ThemeContext } from '../../lib/theming/ThemeContext';
+import { Theme } from '../../lib/theming/Theme';
 import { Popup, PopupPosition } from '../../internal/Popup';
 import { Nullable } from '../../typings/utility-types';
 import { MouseEventType } from '../../typings/event-types';
@@ -78,6 +80,7 @@ export class Hint extends React.Component<HintProps, HintState> {
   };
 
   private timer: Nullable<number> = null;
+  private theme!: Theme;
 
   public UNSAFE_componentWillReceiveProps(nextProps: HintProps) {
     if (!nextProps.manual) {
@@ -97,6 +100,17 @@ export class Hint extends React.Component<HintProps, HintState> {
   }
 
   public render() {
+    return (
+      <ThemeContext.Consumer>
+        {theme => {
+          this.theme = theme;
+          return this.renderMain();
+        }}
+      </ThemeContext.Consumer>
+    );
+  }
+
+  public renderMain() {
     return (
       <Popup
         hasPin
@@ -124,8 +138,8 @@ export class Hint extends React.Component<HintProps, HintState> {
 
     const { pos, maxWidth } = this.props;
     const className = cn({
-      [jsStyles.content()]: true,
-      [jsStyles.contentCenter()]: pos === 'top' || pos === 'bottom',
+      [jsStyles.content(this.theme)]: true,
+      [jsStyles.contentCenter(this.theme)]: pos === 'top' || pos === 'bottom',
     });
     return (
       <div className={className} style={{ maxWidth }}>
