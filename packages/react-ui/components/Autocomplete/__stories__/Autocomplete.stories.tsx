@@ -1,12 +1,58 @@
 import React from 'react';
-
+import { CSFStory, CreeveyStoryParams } from 'creevey';
+import { StoryFn } from '@storybook/addons';
 import { Gapped } from '../../Gapped';
 import { Autocomplete } from '../Autocomplete';
 
-export default { title: 'Autocomplete', parameters: { creevey: { skip: [true] } } };
+export default {
+  title: 'Autocomplete',
+  decorators: [
+    (story: StoryFn<JSX.Element>) => (
+      <div
+        style={{
+          padding: '0 200px 200px 0',
+        }}
+      >
+        {story()}
+      </div>
+    ),
+  ],
+};
 
-export const Simple = () => <UncontrolledAutocomplete source={['One', 'Two', 'Three']} />;
-Simple.story = { name: 'simple' };
+const autocompleteTests: CreeveyStoryParams['tests'] = {
+  async ['idle, focus and type']() {
+    const screenshotElement = this.browser.findElement({ css: '#test-element' });
+    const autocompleteElement = this.browser.findElement({ css: '[data-comp-name~="Autocomplete"]' });
+
+    const idle = await screenshotElement.takeScreenshot();
+    await this.browser
+      .actions({ bridge: true })
+      .click(autocompleteElement)
+      .perform();
+    const focused = await screenshotElement.takeScreenshot();
+    await this.browser
+      .actions({ bridge: true })
+      .sendKeys('o')
+      .perform();
+    const typed = await screenshotElement.takeScreenshot();
+
+    await this.expect({
+      idle,
+      focused,
+      typed,
+    }).to.matchImages();
+  },
+};
+
+export const Simple: CSFStory<JSX.Element> = () => <UncontrolledAutocomplete source={['One', 'Two', 'Three']} />;
+Simple.story = {
+  name: 'simple',
+  parameters: {
+    creevey: {
+      tests: autocompleteTests,
+    },
+  },
+};
 
 export const WithRenderItem = () => (
   <UncontrolledAutocomplete
@@ -14,7 +60,14 @@ export const WithRenderItem = () => (
     renderItem={(x: string) => <div>Item: {x.toUpperCase()}</div>}
   />
 );
-WithRenderItem.story = { name: 'with renderItem' };
+WithRenderItem.story = {
+  name: 'with renderItem',
+  parameters: {
+    creevey: {
+      tests: autocompleteTests,
+    },
+  },
+};
 
 export const WithBigRenderItemWidth = () => (
   <UncontrolledAutocomplete
@@ -22,7 +75,14 @@ export const WithBigRenderItemWidth = () => (
     renderItem={(x: string) => <div style={{ width: 400 }}>Item: {x.toUpperCase()}</div>}
   />
 );
-WithBigRenderItemWidth.story = { name: 'with big renderItem width' };
+WithBigRenderItemWidth.story = {
+  name: 'with big renderItem width',
+  parameters: {
+    creevey: {
+      tests: autocompleteTests,
+    },
+  },
+};
 
 export const WithFixedMenuSize = () => (
   <UncontrolledAutocomplete
@@ -40,10 +100,24 @@ export const WithFixedMenuSize = () => (
     menuMaxHeight={150}
   />
 );
-WithFixedMenuSize.story = { name: 'with fixed menu size' };
+WithFixedMenuSize.story = {
+  name: 'with fixed menu size',
+  parameters: {
+    creevey: {
+      tests: autocompleteTests,
+    },
+  },
+};
 
 export const WithOnBlurOnFocusHandlers = () => <WithBlurFocusHandlersExample />;
-WithOnBlurOnFocusHandlers.story = { name: 'with onBlur/onFocus handlers' };
+WithOnBlurOnFocusHandlers.story = {
+  name: 'with onBlur/onFocus handlers',
+  parameters: {
+    creevey: {
+      skip: [true],
+    },
+  },
+};
 
 class UncontrolledAutocomplete extends React.Component<any, any> {
   public state = {
@@ -92,7 +166,7 @@ class WithBlurFocusHandlersExample extends React.Component<any, any> {
 }
 
 export const WithPercentageWidth = () => (
-  <div style={{width: '600px'}}>
+  <div style={{ width: '600px' }}>
     <UncontrolledAutocomplete
       width="50%"
       source={['One', 'Two', 'Three']}
@@ -100,7 +174,14 @@ export const WithPercentageWidth = () => (
     />
   </div>
 );
-WithPercentageWidth.story = { name: 'with percentage width' };
+WithPercentageWidth.story = {
+  name: 'with percentage width',
+  parameters: {
+    creevey: {
+      tests: autocompleteTests,
+    },
+  },
+};
 
 export const WithFixedWidth = () => (
   <UncontrolledAutocomplete
@@ -109,13 +190,27 @@ export const WithFixedWidth = () => (
     renderItem={(x: string) => <div>Item: {x.toUpperCase()}</div>}
   />
 );
-WithFixedWidth.story = { name: 'with fixed width' };
+WithFixedWidth.story = {
+  name: 'with fixed width',
+  parameters: {
+    creevey: {
+      tests: autocompleteTests,
+    },
+  },
+};
 
 export const WithZeroWidth = () => (
-    <UncontrolledAutocomplete
-      width={0}
-      source={['One', 'Two', 'Three']}
-      renderItem={(x: string) => <div>Item: {x.toUpperCase()}</div>}
-    />
+  <UncontrolledAutocomplete
+    width={0}
+    source={['One', 'Two', 'Three']}
+    renderItem={(x: string) => <div>Item: {x.toUpperCase()}</div>}
+  />
 );
-WithZeroWidth.story = { name: 'with zero width' };
+WithZeroWidth.story = {
+  name: 'with zero width',
+  parameters: {
+    creevey: {
+      tests: autocompleteTests,
+    },
+  },
+};
